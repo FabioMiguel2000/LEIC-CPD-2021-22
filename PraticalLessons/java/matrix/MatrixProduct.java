@@ -1,40 +1,73 @@
 package matrix;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+
+enum Operation {
+    NORMAL(1, "Normal Multiplication"),
+    LINE(2, "Line Multiplication"),
+    BLOCK(3, "Block Multiplication"),
+    EXIT(0, "Exit");
+
+
+    final String desc;
+    final int num;
+
+    Operation(int i, String s) {
+        num = i;
+        desc = s;
+    }
+
+    public static Operation from(String s) {
+        return switch (s.trim().toLowerCase()) {
+            case "0", "exit" -> EXIT;
+            case "2", "line" -> LINE;
+            case "3", "block" -> BLOCK;
+            default -> NORMAL;
+        };
+    }
+
+    @Override
+    public String toString() {
+        return desc;
+    }
+}
 
 public class MatrixProduct {
     public static final Scanner IN = new Scanner(System.in);
 
     public static void main(String[] args) {
         while (true) {
-            System.out.println("1. Multiplication");
-            System.out.println("2. Line Multiplication");
-            System.out.println("3. Block Multiplication");
-            System.out.println("0. Quit");
+            Arrays.stream(Operation.values()).forEach(op -> System.out.printf("%d. %s\n", op.num, op));
 
             System.out.print("Selection:");
-            int op = IN.nextInt();
-
-            if (op == 0)
+            Operation op = Operation.from(IN.next());
+            if (op == Operation.EXIT)
                 return;
+
+            System.out.printf("Using %s\n", op);
 
             System.out.print("Dimension (side):");
             int dim = IN.nextInt();
 
             switch (op) {
-                case 1 -> mult(dim);
-                case 2 -> multLine(dim);
-                case 3 -> multBlock(dim);
-                default -> System.out.printf("Invalid operation: %d", op);
+                case NORMAL -> mult(dim);
+                case LINE -> multLine(dim);
+                case BLOCK -> multBlock(dim);
             }
         }
     }
 
     private static void mult(int dim) {
-        double[] ma = allocate(dim, DoubleStream.generate(() -> 1));
-        double[] mb = allocate(dim, DoubleStream.iterate(1, i -> i + 1));
+        double[] ma = Collections.nCopies(dim * dim, 1).stream().mapToDouble(i -> i).toArray();
+        double[] mb = IntStream.rangeClosed(1, dim)
+                .mapToObj(i -> Collections.nCopies(dim, i).stream().mapToDouble(d -> d))
+                .flatMapToDouble(s -> s)
+                .toArray();
+
 
 //        printMatrix(ma, dim);
 //        printMatrix(mb, dim);
@@ -51,28 +84,58 @@ public class MatrixProduct {
             }
         }
 
-        printMatrix(mc, dim);
+        printMatrixFirstLine(mc, dim, 10);
+//        printMatrix(mc, dim);
+    }
+
+
+    private static void multLine(int dim) {
+        double[] ma = Collections
+                .nCopies(dim * dim, 1)
+                .stream()
+                .mapToDouble(i -> i)
+                .toArray();
+
+        double[] mb = IntStream
+                .rangeClosed(1, dim)
+                .mapToObj(i -> Collections.nCopies(dim, i).stream().mapToDouble(d -> d))
+                .flatMapToDouble(s -> s)
+                .toArray();
+
+//        printMatrix(ma, dim);
+//        printMatrix(mb, dim);
+
+        double[] mc = new double[dim * dim];
+
+        for (int line = 0; line < dim; line++) {
+            for (int col = 0; col < dim; col++) {
+                for (int k = 0; k < dim; k++) {
+                    mc[line * dim + k] += ma[line * dim + col] * mb[col * dim + k];
+                }
+            }
+        }
+
+        printMatrixFirstLine(mc, dim, 10);
     }
 
     private static void printMatrix(double[] m, int dim) {
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
-                System.out.printf("%.1f ", m[i * dim + j]);
+                System.out.printf("%.0f ", m[i * dim + j]);
             }
             System.out.println();
         }
         System.out.println();
     }
 
-    private static double[] allocate(int dim, DoubleStream nums) {
-        return nums.limit((long) dim * dim).toArray();
+    private static void printMatrixFirstLine(double[] m, int dim, int n) {
+        for (int j = 0; j < Math.min(n, dim); j++) {
+            System.out.printf("%.0f ", m[j]);
+        }
+        System.out.println();
     }
 
     private static void multBlock(int dim) {
-
-    }
-
-    private static void multLine(int dim) {
 
     }
 }
