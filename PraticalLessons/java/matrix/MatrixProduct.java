@@ -84,7 +84,7 @@ public class MatrixProduct {
             }
         }
 
-        printMatrixFirstLine(mc, dim, 10);
+        printMatrix(mc, dim, 10);
 //        printMatrix(mc, dim);
     }
 
@@ -115,27 +115,58 @@ public class MatrixProduct {
             }
         }
 
-        printMatrixFirstLine(mc, dim, 10);
+        printMatrix(mc, dim);
     }
 
-    private static void printMatrix(double[] m, int dim) {
+    private static void printMatrix(double[] m, int dim, int n) {
+        m:
         for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
+            for (int j = 0; j < dim; j++, n--) {
                 System.out.printf("%.0f ", m[i * dim + j]);
+                if (n <= 1)
+                    break m;
             }
             System.out.println();
         }
         System.out.println();
     }
 
-    private static void printMatrixFirstLine(double[] m, int dim, int n) {
-        for (int j = 0; j < Math.min(n, dim); j++) {
-            System.out.printf("%.0f ", m[j]);
-        }
-        System.out.println();
+    private static void printMatrix(double[] m, int dim) {
+        printMatrix(m, dim, dim * dim);
     }
 
     private static void multBlock(int dim) {
+        System.out.print("Block size:");
+        int blk = IN.nextInt();
 
+        double[] ma = Collections
+                .nCopies(dim * dim, 1)
+                .stream()
+                .mapToDouble(i -> i)
+                .toArray();
+
+        double[] mb = IntStream
+                .rangeClosed(1, dim)
+                .mapToObj(i -> Collections.nCopies(dim, i).stream().mapToDouble(d -> d))
+                .flatMapToDouble(s -> s)
+                .toArray();
+
+        double[] mc = new double[dim * dim];
+
+        for (int i = 0; i < dim / blk; i++) {
+            for (int j = 0; j < dim / blk; j++) {
+                for (int line = 0; line < blk; line++) {
+                    for (int col = 0; col < blk; col++) {
+                        for (int k = 0; k < dim; k++) {
+                            int iLine = (i * blk + line) * dim;
+                            int iCol = j * blk + col;
+                            mc[iLine + k] += ma[iLine + iCol] * mb[iCol * dim + k];
+                        }
+                    }
+                }
+            }
+        }
+
+        printMatrix(mc, dim);
     }
 }
