@@ -1,8 +1,9 @@
 package matrix;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
@@ -68,11 +69,12 @@ public class MatrixProduct {
                 .flatMapToDouble(s -> s)
                 .toArray();
 
-
 //        printMatrix(ma, dim);
 //        printMatrix(mb, dim);
 
         double[] mc = new double[dim * dim];
+
+        Instant start = Instant.now();
 
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
@@ -83,6 +85,9 @@ public class MatrixProduct {
                 mc[i * dim + j] = temp;
             }
         }
+
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
 
         printMatrix(mc, dim, 10);
 //        printMatrix(mc, dim);
@@ -107,6 +112,8 @@ public class MatrixProduct {
 
         double[] mc = new double[dim * dim];
 
+        Instant start = Instant.now();
+
         for (int line = 0; line < dim; line++) {
             for (int col = 0; col < dim; col++) {
                 for (int k = 0; k < dim; k++) {
@@ -114,6 +121,9 @@ public class MatrixProduct {
                 }
             }
         }
+
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
 
         printMatrix(mc, dim);
     }
@@ -153,6 +163,8 @@ public class MatrixProduct {
 
         double[] mc = new double[dim * dim];
 
+        Instant start = Instant.now();
+
         for (int i = 0; i < dim / blk; i++) {
             for (int j = 0; j < dim / blk; j++) {
                 for (int line = 0; line < blk; line++) {
@@ -166,6 +178,9 @@ public class MatrixProduct {
                 }
             }
         }
+
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
 
         printMatrix(mc, dim);
     }
