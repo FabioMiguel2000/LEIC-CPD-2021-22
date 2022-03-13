@@ -117,10 +117,11 @@ void OnMultBlock(int m_ar, int m_br, int blk) {
             for (int k = 0; k < m_ar / blk; k++) {
                 for (int line = 0; line < blk; line++) {
                     for (int col = 0; col < blk; col++) {
-                        for (int kk = k * blk; kk < k * blk + blk; kk++) {
-                            int iLine = (i * blk + line) * m_ar;
+                        for (int kk = 0; kk < blk; kk++) {
+                            int iLine = i * blk + line;
                             int iCol = j * blk + col;
-                            phc[iLine + iCol] += pha[iLine + kk] * phb[kk * m_ar + iCol];
+                            int ik = k * blk + kk;
+                            phc[iLine * m_ar + ik] += pha[iLine * m_ar + iCol] * phb[iCol * m_ar + ik];
                         }
                     }
                 }

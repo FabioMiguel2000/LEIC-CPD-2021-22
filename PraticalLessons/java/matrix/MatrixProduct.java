@@ -170,10 +170,11 @@ public class MatrixProduct {
                 for (int k = 0; k < dim / blk; k++) {
                     for (int line = 0; line < blk; line++) {
                         for (int col = 0; col < blk; col++) {
-                            for (int kk = k * blk; k < k * blk + blk; kk++) {
-                                int iLine = (i * blk + line) * dim;
+                            for (int kk = 0; k < blk; kk++) {
+                                int iLine = i * blk + line;
                                 int iCol = j * blk + col;
-                                mc[iLine + iCol] += ma[iLine + kk] * mb[kk * dim + iCol];
+                                int ik = k * blk + kk;
+                                mc[iLine * dim + ik] += ma[iLine * dim + iCol] * mb[iCol * dim + ik];
                             }
                         }
                     }
