@@ -125,7 +125,7 @@ public class MatrixProduct {
         Instant end = Instant.now();
         System.out.println("Time: " + Duration.between(start, end));
 
-        printMatrix(mc, dim);
+        printMatrix(mc, dim, 10);
     }
 
     private static void printMatrix(double[] m, int dim, int n) {
@@ -167,12 +167,14 @@ public class MatrixProduct {
 
         for (int i = 0; i < dim / blk; i++) {
             for (int j = 0; j < dim / blk; j++) {
-                for (int line = 0; line < blk; line++) {
-                    for (int col = 0; col < blk; col++) {
-                        for (int k = 0; k < dim; k++) {
-                            int iLine = (i * blk + line) * dim;
-                            int iCol = j * blk + col;
-                            mc[iLine + k] += ma[iLine + iCol] * mb[iCol * dim + k];
+                for (int k = 0; k < dim / blk; k++) {
+                    for (int line = 0; line < blk; line++) {
+                        for (int col = 0; col < blk; col++) {
+                            for (int kk = k * blk; k < k * blk + blk; kk++) {
+                                int iLine = (i * blk + line) * dim;
+                                int iCol = j * blk + col;
+                                mc[iLine + iCol] += ma[iLine + kk] * mb[kk * dim + iCol];
+                            }
                         }
                     }
                 }
@@ -182,6 +184,6 @@ public class MatrixProduct {
         Instant end = Instant.now();
         System.out.println("Time: " + Duration.between(start, end));
 
-        printMatrix(mc, dim);
+        printMatrix(mc, dim, 10);
     }
 }
