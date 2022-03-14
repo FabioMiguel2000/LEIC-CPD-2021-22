@@ -20,6 +20,14 @@ void print_matrix(double *m, int dim, int n) {
 
 void print_matrix(double *m, int dim) { print_matrix(m, dim, dim * dim); }
 
+/*
+ * Normal Matrix Multiplication Algorithm used
+ * See https://www.mathsisfun.com/algebra/matrix-multiplying.html 
+ *
+ * m_ar : number of rows
+ * m_br : number of columns
+ *
+ */
 void OnMult(int m_ar, int m_br) {
     double *pha, *phb, *phc;
 
@@ -28,35 +36,52 @@ void OnMult(int m_ar, int m_br) {
     phc = (double *)malloc((m_ar * m_ar) * sizeof(double));
 
     for (int i = 0; i < m_ar; i++)
-        for (int j = 0; j < m_ar; j++) pha[i * m_ar + j] = 1;
-
+        for (int j = 0; j < m_ar; j++) pha[i * m_ar + j] = 1;                   // Initializing all elements of the first matrix (pha) to 1
     for (int i = 0; i < m_br; i++)
-        for (int j = 0; j < m_br; j++) phb[i * m_br + j] = (double)(i + 1);
+        for (int j = 0; j < m_br; j++) phb[i * m_br + j] = (double)(i + 1);     /* Initializing all elements of the second matrix (phb) with value according to their row, e.g 
+                                                                                  [1,1,1,
+                                                                                   2,2,2,
+                                                                                   3,3,3]
+                                                                                */
 
     SYSTEMTIME Time1, Time2;
-    Time1 = clock();
+
+    Time1 = clock();        // Start Timer
 
     for (int i = 0; i < m_ar; i++) {
         for (int j = 0; j < m_br; j++) {
             double temp = 0;
             for (int k = 0; k < m_ar; k++) {
-                temp += pha[i * m_ar + k] * phb[k * m_br + j];
+                temp += pha[i * m_ar + k] * phb[k * m_br + j];                  // Calculating using dot product
             }
             phc[i * m_ar + j] = temp;
         }
     }
 
-    Time2 = clock();
+    Time2 = clock();        // Stop Timer
     fprintf(stdout, "Time: %3.3f seconds\n",
             (double)(Time2 - Time1) / CLOCKS_PER_SEC);
 
     cout << "Result matrix: " << endl;
-    print_matrix(phc, m_ar, 10);
+    print_matrix(phc, m_ar, 10);                                                // Prints first 10 elements of the resulting matrix (phc)
 
     free(pha);
     free(phb);
     free(phc);
 }
+
+/*
+ * In this function, the matrix multiplication algorithm is slightly changed,
+ * so that every element of the first matrix is only stored once in the 
+ * cache memory (when the value is being accessed and used), and therefore 
+ * efficiency is improved by reducing the unnecessary time which was used to 
+ * store the same value in the cache over and over again
+ * 
+ * See Slide 28 https://moodle.up.pt/pluginfile.php/171415/mod_resource/content/3/CPD_intro.pdf
+ *
+ * m_ar : number of rows
+ * m_br : number of columns
+ */
 
 void OnMultLine(int m_ar, int m_br) {
     double *pha, *phb, *phc;
@@ -94,6 +119,20 @@ void OnMultLine(int m_ar, int m_br) {
     free(phb);
     free(phc);
 }
+
+/*
+ * In this function, a divide and conquer algorithm is used to solve the matrix,
+ * the idea is to divide the matrix into blocks, which are treated as independent matrixes
+ * and solved, this can also help to avoid the problem of not having enought cache memory 
+ * for a large matrix (and uses main memory, which much slower), additionally it can also 
+ * further improve performance by using parallelization (each block can be solved independently)
+ * 
+ * 
+ *
+ * m_ar : number of rows
+ * m_br : number of columns
+ */
+
 
 void OnMultBlock(int m_ar, int m_br, int blk) {
     double *pha, *phb, *phc;
