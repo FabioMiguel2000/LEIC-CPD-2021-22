@@ -1,8 +1,9 @@
 package matrix;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.IntStream;
 
@@ -68,11 +69,12 @@ public class MatrixProduct {
                 .flatMapToDouble(s -> s)
                 .toArray();
 
-
 //        printMatrix(ma, dim);
 //        printMatrix(mb, dim);
 
         double[] mc = new double[dim * dim];
+
+        Instant start = Instant.now();
 
         for (int i = 0; i < dim; i++) {
             for (int j = 0; j < dim; j++) {
@@ -83,6 +85,9 @@ public class MatrixProduct {
                 mc[i * dim + j] = temp;
             }
         }
+
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
 
         printMatrix(mc, dim, 10);
 //        printMatrix(mc, dim);
@@ -107,6 +112,8 @@ public class MatrixProduct {
 
         double[] mc = new double[dim * dim];
 
+        Instant start = Instant.now();
+
         for (int line = 0; line < dim; line++) {
             for (int col = 0; col < dim; col++) {
                 for (int k = 0; k < dim; k++) {
@@ -115,7 +122,10 @@ public class MatrixProduct {
             }
         }
 
-        printMatrix(mc, dim);
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
+
+        printMatrix(mc, dim, 10);
     }
 
     private static void printMatrix(double[] m, int dim, int n) {
@@ -153,20 +163,28 @@ public class MatrixProduct {
 
         double[] mc = new double[dim * dim];
 
+        Instant start = Instant.now();
+
         for (int i = 0; i < dim / blk; i++) {
             for (int j = 0; j < dim / blk; j++) {
-                for (int line = 0; line < blk; line++) {
-                    for (int col = 0; col < blk; col++) {
-                        for (int k = 0; k < dim; k++) {
-                            int iLine = (i * blk + line) * dim;
-                            int iCol = j * blk + col;
-                            mc[iLine + k] += ma[iLine + iCol] * mb[iCol * dim + k];
+                for (int k = 0; k < dim / blk; k++) {
+                    for (int line = 0; line < blk; line++) {
+                        for (int col = 0; col < blk; col++) {
+                            for (int kk = 0; k < blk; kk++) {
+                                int iLine = i * blk + line;
+                                int iCol = j * blk + col;
+                                int ik = k * blk + kk;
+                                mc[iLine * dim + ik] += ma[iLine * dim + iCol] * mb[iCol * dim + ik];
+                            }
                         }
                     }
                 }
             }
         }
 
-        printMatrix(mc, dim);
+        Instant end = Instant.now();
+        System.out.println("Time: " + Duration.between(start, end));
+
+        printMatrix(mc, dim, 10);
     }
 }
